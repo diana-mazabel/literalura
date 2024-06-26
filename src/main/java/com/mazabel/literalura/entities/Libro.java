@@ -3,6 +3,8 @@ package com.mazabel.literalura.entities;
 import com.mazabel.literalura.model.DatosLibro;
 import jakarta.persistence.*;
 
+import java.util.List;
+
 
 @Entity
 @Table(name= "libros")
@@ -14,6 +16,7 @@ public class Libro {
     private String titulo;
 
     @ManyToOne
+    @JoinColumn(name = "autor_id")
     private Autor autor;
     private String idioma;
     private Double numDescargas;
@@ -45,12 +48,14 @@ public class Libro {
         this.titulo = titulo;
     }
 
-
     public Autor getAutor() {
         return autor;
     }
 
     public void setAutor(Autor autor) {
+        List<Libro> libros = autor.getLibros();
+        libros.add(this);
+        autor.setLibros(libros);
         this.autor = autor;
     }
 
@@ -72,11 +77,12 @@ public class Libro {
 
     @Override
     public String toString() {
-        return "----Libro----\n" +
-                "Titulo= " + titulo + '\'' +
-                "Autor= " + autor + '\'' +
-                "Idioma= " + idioma + '\'' +
+        return "-------Libro-------\n" +
+                "ID: "  + id + "\n" +
+                "Titulo= " + titulo + "\n" +
+                "Autor= " + autor.getNombre() + "\n" +
+                "Idioma= " + idioma + "\n" +
                 "No. de Descargas= " + numDescargas +
-                "\n-----------";
+                "\n------------------";
     }
 }

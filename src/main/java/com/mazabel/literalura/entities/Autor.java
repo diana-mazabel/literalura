@@ -14,9 +14,9 @@ public class Autor {
     private Long id;
     @Column(unique = true)
     String nombre;
-    String fechaDeNacimiento;
-    String fechaDeFallecimiento;
-    @OneToMany(mappedBy = "autor")
+    int fechaDeNacimiento;
+    int fechaDeFallecimiento;
+    @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     List<Libro> libros;
 
 
@@ -25,8 +25,8 @@ public class Autor {
 
     public Autor(DatosAutor autor) {
         this.nombre = autor.nombre();
-        this.fechaDeNacimiento = autor.fechaDeNacimiento();
-        this.fechaDeFallecimiento = autor.fechaDeFallecimiento();
+        this.fechaDeNacimiento = Integer.valueOf(autor.fechaDeNacimiento());
+        this.fechaDeFallecimiento = Integer.valueOf(autor.fechaDeFallecimiento());
     }
 
     public String getNombre() {
@@ -37,19 +37,19 @@ public class Autor {
         this.nombre = nombre;
     }
 
-    public String getFechaDeNacimiento() {
+    public int getFechaDeNacimiento() {
         return fechaDeNacimiento;
     }
 
-    public void setFechaDeNacimiento(String fechaDeNacimiento) {
+    public void setFechaDeNacimiento(int fechaDeNacimiento) {
         this.fechaDeNacimiento = fechaDeNacimiento;
     }
 
-    public String getFechaDeFallecimiento() {
+    public int getFechaDeFallecimiento() {
         return fechaDeFallecimiento;
     }
 
-    public void setFechaDeFallecimiento(String fechaDeFallecimiento) {
+    public void setFechaDeFallecimiento(int fechaDeFallecimiento) {
         this.fechaDeFallecimiento = fechaDeFallecimiento;
     }
 
@@ -58,6 +58,7 @@ public class Autor {
     }
 
     public void setLibros(List<Libro> libros) {
+        libros.forEach(libro -> libro.setAutor(this));
         this.libros = libros;
     }
 
@@ -71,14 +72,13 @@ public class Autor {
 
     @Override
     public String toString() {
-        String librosTitulo = libros.stream()
-                .map(libro -> libro.getTitulo())
-                .collect(Collectors.joining(", "));
-        return "---Autor---\n" +
-                "Nombre= " + nombre + '\'' +
-                "Fecha de nacimiento= " + fechaDeNacimiento + '\'' +
-                "Fecha de fallecimiento= " + fechaDeFallecimiento + '\'' +
-                "Libros= " + librosTitulo +
-                "\n-----------";
+        String titulos = libros.stream().map(l-> l.getTitulo()).collect(Collectors.joining(", "));
+        return "------Autor------\n" +
+                "ID: "  + id + "\n" +
+                "Nombre= " + nombre + "\n" +
+                "Fecha de nacimiento= " + fechaDeNacimiento + "\n" +
+                "Fecha de fallecimiento= " + fechaDeFallecimiento + "\n" +
+                "Libros= " + titulos +
+                "\n--------------------";
     }
 }
