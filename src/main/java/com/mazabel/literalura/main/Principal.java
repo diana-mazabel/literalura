@@ -105,6 +105,7 @@ public class Principal {
             repositorioAutor.save(autor);
             Libro libro = new Libro(datosLibro, autor);
             repositorioLibro.save(libro);
+            System.out.println(libro);
 
         } else {
             System.out.println("No se encontró el Libro");
@@ -125,20 +126,16 @@ public class Principal {
 
 
     private void buscarAutoresVivos() {
-        System.out.println("Ingresa el rango de años entre los que deseas buscar");
-        System.out.print("Año de inicio: ");
-        var anhoInicio = Integer.valueOf(scan.nextLine());
-        System.out.print("Año de fin: ");
-        var anhoFinal = Integer.valueOf(scan.nextLine());
-        System.out.println("Buscando autores vivos entre los años "+anhoInicio+ " y "+ anhoFinal);
-        String resultado = busquedaAPIAñosAutores(anhoInicio, anhoFinal);
-        var busqueda = conversor.obtenerDatos(resultado, Datos.class);
-        List<DatosLibro> librosEncontrados = busqueda.resultados().stream().toList();
-        //List<DatosAutor> autores = null;
-        if (!librosEncontrados.isEmpty()) {
-            for (DatosLibro libro: librosEncontrados){
-                System.out.println(libro.datosAutor().get(0));
-            }
+        System.out.println("Ingresa el año en el que deseas buscar: ");
+        var anho = Integer.valueOf(scan.nextLine());
+        System.out.println("Buscando autores vivos en el año " + anho);
+        List<Autor> resultado = repositorioAutor.findAll();
+        List<Autor> autoresVivos = resultado.stream()
+                .filter(autor -> autor.getFechaDeNacimiento() <= anho)
+                .filter(autor -> autor.getFechaDeFallecimiento() == null || autor.getFechaDeFallecimiento() >= anho).toList();
+        if (!autoresVivos.isEmpty()) {
+            System.out.println("Se encontraron los siguientes autores: ");
+            System.out.println(autoresVivos);
         } else {
             System.out.println("No se encontró ningún autor");
         }
@@ -180,19 +177,15 @@ public class Principal {
     }
 
     private void buscarPorIdioma(String idioma){
-        Optional<Libro> listaLibrosIdioma = repositorioLibro.findByIdioma(idioma);
+        List<Libro> listaLibrosIdioma = repositorioLibro.findByIdioma(idioma);
 
-        if (listaLibrosIdioma.isPresent()){
+        if (!listaLibrosIdioma.isEmpty()){
             System.out.println("Libros en idioma " + idioma.toUpperCase());
-            List<Libro> listaLibros = listaLibrosIdioma.stream().collect(Collectors.toList());
-            listaLibros.forEach(System.out::println);
+            System.out.println("-----");
+            listaLibrosIdioma.forEach(System.out::println);
         } else {
             System.out.println("No se encontraron libros en ese idioma");
         }
     }
-    private Autor buscarAutor(Autor autor){
-        List<Libro> listaLibros = repositorioLibro.findAll();
-        //List<Autor> autoresRepositorio = listaLibros.stream().FlatMap(libro -> libro.getAutor().);
-        return autor;
-    }
+
 }
